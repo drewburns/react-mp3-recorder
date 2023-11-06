@@ -58,7 +58,7 @@ export default class Recorder extends Component {
         >
           <img src={micIcon} width={24} height={24} />
         </div> */}
-        <div>
+        <div className={styles.button}>
           <img
             onClick={() => {
               this.state.isRecording ? this._onMouseUp() : this._onMouseDown();
