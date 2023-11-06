@@ -2,41 +2,42 @@
  * @class Recorder
  */
 
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import classNames from 'classnames'
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import classNames from "classnames";
 
-import vmsg from './vmsg'
+import vmsg from "./vmsg";
 
-import micIcon from './mic-icon-white.svg'
-import wasmURL from './vmsg.wasm'
+import micIcon from "./mic-icon-white.svg";
+import stopIcon from "./stop.svg";
+import wasmURL from "./vmsg.wasm";
 
-import styles from './styles.css'
+import styles from "./styles.css";
 
-const shimURL = 'https://unpkg.com/wasm-polyfill.js@0.2.0/wasm-polyfill.js'
+const shimURL = "https://unpkg.com/wasm-polyfill.js@0.2.0/wasm-polyfill.js";
 
 export default class Recorder extends Component {
   static propTypes = {
     recorderParams: PropTypes.object,
     onRecordingComplete: PropTypes.func,
     onRecordingError: PropTypes.func,
-    className: PropTypes.string
-  }
+    className: PropTypes.string,
+  };
 
   static defaultProps = {
-    recorderParams: { },
-    onRecordingComplete: () => { },
-    onRecordingError: () => { }
-  }
+    recorderParams: {},
+    onRecordingComplete: () => {},
+    onRecordingError: () => {},
+  };
 
   state = {
-    isRecording: false
-  }
+    isRecording: false,
+  };
 
-  _recorder = null
+  _recorder = null;
 
   componentWillUnmount() {
-    this._cleanup()
+    this._cleanup();
   }
 
   render() {
@@ -46,58 +47,65 @@ export default class Recorder extends Component {
       onRecordingError,
       className,
       ...rest
-    } = this.props
+    } = this.props;
 
     return (
-      <div
-        className={classNames(styles.container, className)}
-        {...rest}
-      >
-        <div
+      <div className={classNames(styles.container, className)} {...rest}>
+        {/* <div
           className={styles.button}
           onMouseDown={this._onMouseDown}
           onMouseUp={this._onMouseUp}
         >
           <img src={micIcon} width={24} height={24} />
+        </div> */}
+        <div>
+          <img
+            onClick={() => {
+              this.state.isRecording ? this._onMouseUp() : this._onMouseDown();
+            }}
+            src={this.state.isRecording ? micIcon : stopIcon}
+            width={24}
+            height={24}
+          />
         </div>
       </div>
-    )
+    );
   }
 
   _cleanup() {
     if (this._recorder) {
-      this._recorder.stopRecording()
-      this._recorder.close()
-      delete this._recorder
+      this._recorder.stopRecording();
+      this._recorder.close();
+      delete this._recorder;
     }
   }
 
   _onMouseDown = () => {
-    const {
-      recorderParams
-    } = this.props
+    const { recorderParams } = this.props;
 
-    this._cleanup()
+    this._cleanup();
 
     this._recorder = new vmsg.Recorder({
       wasmURL,
       shimURL,
-      ...recorderParams
-    })
+      ...recorderParams,
+    });
 
-    this._recorder.init()
+    this._recorder
+      .init()
       .then(() => {
-        this._recorder.startRecording()
-        this.setState({ isRecording: true })
+        this._recorder.startRecording();
+        this.setState({ isRecording: true });
       })
-      .catch((err) => this.props.onRecordingError(err))
-  }
+      .catch((err) => this.props.onRecordingError(err));
+  };
 
   _onMouseUp = () => {
     if (this._recorder) {
-      this._recorder.stopRecording()
+      this._recorder
+        .stopRecording()
         .then((blob) => this.props.onRecordingComplete(blob))
-        .catch((err) => this.props.onRecordingError(err))
+        .catch((err) => this.props.onRecordingError(err));
     }
-  }
+  };
 }
