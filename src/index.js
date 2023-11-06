@@ -63,7 +63,7 @@ export default class Recorder extends Component {
             onClick={() => {
               this.state.isRecording ? this._onMouseUp() : this._onMouseDown();
             }}
-            src={this.state.isRecording ? micIcon : stopIcon}
+            src={this.state.isRecording ? stopIcon : micIcon}
             width={24}
             height={24}
           />
