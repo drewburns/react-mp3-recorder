@@ -101,6 +101,7 @@ export default class Recorder extends Component {
   };
 
   _onMouseUp = () => {
+    this.setState({ isRecording: false });
     if (this._recorder) {
       this._recorder
         .stopRecording()
